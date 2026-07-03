@@ -117,7 +117,6 @@
 
             <!-- DASHBOARD DIGITAL (Derecha) -->
             <div class="lg:col-span-8 mt-2 md:mt-0">
-                <!-- Aumentado padding inferior para no chocar en moviles -->
                 <div class="bg-black p-4 md:p-6 rounded-2xl shadow-2xl border border-gray-800 relative overflow-hidden flex flex-col h-full min-h-[450px]">
                     
                     <!-- Selector de Plano optimizado para touch -->
@@ -196,9 +195,8 @@
         </div>
     </div>
 
-    <!-- PWA Service Worker Inline Setup para permitir instalacion local -->
     <script>
-        // 1. Configuracion del Manifest JSON en linea (Para que el celular reconozca el icono y nombre)
+        // Configuracion del Manifest JSON en linea para PWA e iconos
         const manifestData = {
             "name": "AlineaPro Digital",
             "short_name": "AlineaPro",
@@ -222,19 +220,6 @@
         const manifestUrl = URL.createObjectURL(manifestBlob);
         document.getElementById('manifest-placeholder').setAttribute('href', manifestUrl);
 
-        // 2. Registro de Service Worker Dummy (Requisito de Google Chrome para mostrar boton Instalar)
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                self.addEventListener('install', (e) => { e.waitUntil(self.skipWaiting()); });
-                self.addEventListener('activate', (e) => { e.waitUntil(self.clients.claim()); });
-                self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => new Response('Offline'))); });
-            `;
-            const swBlob = new Blob([swCode], {type: 'text/javascript'});
-            const swUrl = URL.createObjectURL(swBlob);
-            
-            navigator.serviceWorker.register(swUrl).catch(console.error);
-        }
-
         // ==========================================
         // LOGICA DE LA APLICACION
         // ==========================================
@@ -252,7 +237,6 @@
         const actRear = document.getElementById('action-rear');
         const crossStatus = document.getElementById('cross-rule-status');
 
-        // Seleccionar todo el texto al tocar un input (mejor UX en movil)
         inputs.forEach(input => {
             input.addEventListener('input', calculate);
             input.addEventListener('focus', function() { this.select(); });
@@ -267,7 +251,7 @@
                 btnH.className = 'flex-1 sm:flex-none px-2 sm:px-6 py-3 md:py-2 rounded-lg font-bold text-xs md:text-sm bg-blue-600 text-white shadow-md transition-all duration-200 active:scale-95';
                 btnV.className = 'flex-1 sm:flex-none px-2 sm:px-6 py-3 md:py-2 rounded-lg font-bold text-xs md:text-sm text-gray-400 hover:text-white transition-all duration-200 active:scale-95';
             }
-            // Add subtle animation to dashboard when switching
+            
             document.querySelector('.machine-gradient').parentElement.style.opacity = '0.5';
             setTimeout(() => {
                 document.querySelector('.machine-gradient').parentElement.style.opacity = '1';
@@ -303,7 +287,6 @@
         }
 
         function calculate() {
-            // Safety check inputs, default to 0 if NaN
             const getVal = (id) => {
                 const val = parseFloat(document.getElementById(id).value);
                 return isNaN(val) ? 0 : val;
@@ -311,7 +294,7 @@
 
             const tolOffset = getVal('tol-offset');
             const tolAng = getVal('tol-ang');
-            const D = getVal('dim-d') || 1; // Prevent division by zero
+            const D = getVal('dim-d') || 1; 
             const L1 = getVal('dim-l1');
             const L2 = getVal('dim-l2');
 
@@ -320,7 +303,6 @@
             const a0 = getVal('a-0'); const a90 = getVal('a-90');
             const a180 = getVal('a-180'); const a270 = getVal('a-270');
 
-            // Regla de la Cruz para Borde y Cara
             const sumR_Vert = r0 + r180;
             const sumR_Horz = r90 + r270;
             const diffR = Math.abs(sumR_Vert - sumR_Horz);
@@ -337,14 +319,14 @@
 
             if (currentPlane === 'vertical') {
                 offset = r180 / 2;
-                ang = (a180 / D) * 100; // mm/100mm
+                ang = (a180 / D) * 100;
                 
                 corrFront = offset + (ang/100) * L1;
                 corrRear = offset + (ang/100) * (L1 + L2);
 
                 updateActionColor(actFront, corrFront, true);
                 updateActionColor(actRear, corrRear, true);
-            } else { // horizontal
+            } else { 
                 offset = (r90 - r270) / 2;
                 ang = ((a90 - a270) / D) * 100;
 
@@ -358,7 +340,6 @@
             elAng.innerText = formatVal(ang);
             elOffset.innerText = formatVal(offset);
             
-            // Format corrections removing minus sign for display (action arrows handle direction)
             valFront.innerText = Math.abs(corrFront).toFixed(3);
             valRear.innerText = Math.abs(corrRear).toFixed(3);
 
@@ -366,7 +347,6 @@
             updateToleranceColor(elOffset, offset, tolOffset);
         }
 
-        // Init
         setTimeout(calculate, 100);
     </script>
 </body>
