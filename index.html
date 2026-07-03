@@ -274,7 +274,9 @@
         </div>
         
     </div>
-
+<button onclick="limpiarDatos()" style="background-color: #ff9800; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+  🔄 Nueva Alineación
+</button>
     <!-- PWA Setup y Lógica -->
     <script>
         // Poner fecha actual automaticamente
@@ -495,6 +497,45 @@
         }
 
         setTimeout(calculate, 100);
+        // 1. Guardar datos automáticamente cada vez que escribes algo
+document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('input', function() {
+        // Guarda el valor en la memoria del teléfono usando el ID de la celda
+        localStorage.setItem(this.id, this.value);
+    });
+});
+
+// 2. Cargar datos guardados automáticamente al abrir la app
+window.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('input').forEach(input => {
+        if (localStorage.getItem(input.id)) {
+            input.value = localStorage.getItem(input.id);
+        }
+    });
+    
+    // Si tienes una función principal que recalcula los colores y flechas, la ejecutamos
+    if (typeof calculate === "function") {
+        calculate();
+    }
+});
+
+// 3. Función para el botón de limpiar la pantalla
+function limpiarDatos() {
+    if(confirm("¿Estás seguro de que deseas borrar todos los datos para iniciar una nueva alineación?")) {
+        // Borra la memoria permanente
+        localStorage.clear();
+        
+        // Limpia las casillas en la pantalla
+        document.querySelectorAll('input').forEach(input => {
+            input.value = '';
+        });
+        
+        // Actualiza los gráficos y cálculos a cero
+        if (typeof calculate === "function") {
+            calculate();
+        }
+    }
+}
     </script>
 </body>
 </html>
